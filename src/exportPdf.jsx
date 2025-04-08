@@ -1,4 +1,3 @@
-import { tiptapEditors } from "./editor.jsx";
 import { showStatusMessage, generateFileName } from "./utils.js";
 import "katex/dist/katex.min.css";
 
@@ -71,26 +70,19 @@ export async function setupPdfExport() {
 
       let currentPage = addNewPage();
 
-      const grouped = {};
-      tiptapEditors.forEach((entry) => {
-        const id = entry.container.dataset.qid || entry.container;
-        if (!grouped[id]) grouped[id] = { options: [], container: entry.container };
+      const questionBoxes = document.querySelectorAll(".question-box");
+      questionBoxes.forEach((box, index) => {
+        const questionField = box.querySelector("math-field.question");
+        const questionLatex = questionField?.value?.trim() || "";
 
-        const data = stripHtml(entry.editor.getHTML());
-        if (entry.type === "question") {
-          grouped[id].question = data;
-        } else {
-          grouped[id].options[entry.index] = data;
-        }
-      });
+        const difficulty = box.querySelector(".difficulty")?.value || "medium";
 
-      let index = 1;
-      for (const q of Object.values(grouped)) {
-        const difficulty = q.container.querySelector(".difficulty")?.value || "medium";
-        const question = q.question || "";
-        const options = q.options || [];
+        const options = [];
+        box.querySelectorAll("math-field.option").forEach((opt) => {
+          options.push(opt.value.trim());
+        });
 
-        const questionText = `${index}. ${question} (${difficulty})`;
+        const questionText = `${index + 1}. ${stripLatex(questionLatex)} (${difficulty})`;
 
         if (y < 120) currentPage = addNewPage();
 
@@ -105,7 +97,7 @@ export async function setupPdfExport() {
 
         options.forEach((opt, i) => {
           const label = String.fromCharCode(97 + i);
-          currentPage.drawText(`   (${label}) ${opt}`, {
+          currentPage.drawText(`   (${label}) ${stripLatex(opt)}`, {
             x: 70,
             y,
             size: 10,
@@ -116,8 +108,7 @@ export async function setupPdfExport() {
         });
 
         y -= 10;
-        index++;
-      }
+      });
 
       pages.forEach((page, i) => {
         const footer = `Page ${i + 1}`;
@@ -148,10 +139,13 @@ export async function setupPdfExport() {
   });
 }
 
-function stripHtml(html) {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  return div.textContent || div.innerText || "";
+// Strip LaTeX formatting for raw text fallback
+function stripLatex(latex) {
+  return latex
+    .replace(/\\[a-zA-Z]+/g, "")
+    .replace(/[{}$]/g, "")
+    .replace(/_/g, " ")
+    .trim();
 }
 
 setupPdfExport();

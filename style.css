@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base styling */
+/* Global Layout */
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f8fafc;
@@ -12,179 +12,174 @@ body {
 }
 
 .container {
-  max-width: 920px;
+  max-width: 960px;
   margin: 40px auto;
   background-color: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.06);
+  padding: 32px;
+  border-radius: 14px;
+  box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.08);
 }
 
-/* Header */
+/* Headings */
 h1 {
   font-size: 2.5rem;
-  color: #2563eb;
+  color: #1d4ed8;
   font-weight: 700;
 }
 
 p {
-  color: #6b7280;
-  font-size: 1rem;
+  color: #64748b;
+  font-size: 1.05rem;
 }
 
-/* Inputs & Dropdowns */
+/* Input Elements */
 input, select {
   width: 100%;
-  padding: 10px;
-  margin-top: 4px;
+  padding: 12px;
+  margin-top: 6px;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.95rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f9fafb;
 }
 
 input:focus, select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
-/* Question block */
+/* Question Box */
 .question-box {
-  background-color: #f9fafb;
+  background-color: #fefefe;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 24px;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
 }
 
-/* Tiptap Editor Container */
+/* Editor Wrappers */
 .editor-wrapper {
-  background-color: #eff6ff;
+  background-color: #f0f9ff;
   border: 1px solid #cbd5e1;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 12px;
 }
 
-/* Tiptap Editor itself */
+/* Editor Content */
 .ProseMirror {
-  min-height: 100px;
+  min-height: 120px;
   padding: 12px;
-  font-size: 1rem;
-  line-height: 1.6;
-  border-radius: 6px;
+  font-size: 1.05rem;
+  border-radius: 8px;
   background-color: #ffffff;
   border: none;
   outline: none;
+  line-height: 1.65;
 }
 
-/* Math Preview Styling */
+/* Math Preview Area */
 .katex-preview {
-  font-size: 1rem;
+  background-color: #f9fafb;
+  font-size: 1.05rem;
   color: #1e293b;
   border: 1px dashed #cbd5e1;
-  margin-top: 6px;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+/* Button Base */
+button {
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 10px 16px;
 }
 
 /* Toolbar Button */
 .insert-math-btn {
   background-color: #ede9fe;
   color: #5b21b6;
-  font-size: 0.85rem;
-  padding: 6px 10px;
-  border-radius: 5px;
   border: 1px solid #ddd6fe;
-  margin-bottom: 6px;
 }
 
 .insert-math-btn:hover {
   background-color: #ddd6fe;
 }
 
-/* Buttons */
-button {
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  font-size: 0.95rem;
-  font-weight: 500;
-  border-radius: 6px;
-  padding: 8px 14px;
-}
-
+/* Action Buttons */
 button:hover {
   transform: translateY(-1px);
   opacity: 0.95;
 }
 
-/* Primary Buttons */
 .add-question {
   background-color: #2563eb;
-  color: #fff;
+  color: #ffffff;
 }
 .undo-action {
-  background-color: #ef4444;
-  color: #fff;
+  background-color: #dc2626;
+  color: #ffffff;
 }
 
-/* Export Buttons */
+/* Export Buttons Grid */
 .export-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-top: 20px;
-}
-.export-buttons button {
-  padding: 10px;
-  color: white;
-  font-weight: 600;
-}
-.export-json {
-  background-color: #f59e0b;
-}
-.export-latex {
-  background-color: #9333ea;
-}
-.export-pdf {
-  background-color: #14b8a6;
-}
-#save-progress {
-  background-color: #10b981;
-}
-#reset-page {
-  background-color: #d97706;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 24px;
 }
 
-/* Delete Button */
+.export-buttons button {
+  font-weight: 600;
+  color: white;
+}
+
+.export-json { background-color: #f59e0b; }
+.export-latex { background-color: #9333ea; }
+.export-pdf { background-color: #0d9488; }
+#save-progress { background-color: #059669; }
+#reset-page { background-color: #d97706; }
+
+/* Delete Floating Button */
 .delete-question {
   position: absolute;
   top: 8px;
   right: 8px;
   background-color: #dc2626;
   color: #fff;
+  padding: 6px 12px;
   border-radius: 9999px;
-  padding: 4px 10px;
 }
 
 /* File Inputs */
 input[type="file"] {
-  background: white;
+  background-color: #ffffff;
   border: 1px solid #d1d5db;
-  padding: 4px;
+  padding: 6px;
   border-radius: 6px;
 }
 
 /* LaTeX Highlighting */
 .math-highlight {
   background-color: #fef08a;
-  padding: 2px 4px;
+  padding: 3px 6px;
   border-radius: 4px;
   font-family: monospace;
   color: #374151;
 }
+
+/* Dropdown Styling */
 .math-dropdown {
-    max-height: 250px;
-    overflow-y: auto;
-  }
-  
+  max-height: 250px;
+  overflow-y: auto;
+  border-radius: 8px;
+  z-index: 30;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

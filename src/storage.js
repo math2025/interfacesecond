@@ -1,5 +1,4 @@
 import { createQuestionBlock } from "./questionManager.jsx";
-import { tiptapEditors } from "./questionManager.jsx";
 import { showStatusMessage } from "./utils.js";
 
 export function saveQuestionsToLocal() {
@@ -10,24 +9,14 @@ export function saveQuestionsToLocal() {
   const questions = [];
 
   document.querySelectorAll(".question-box").forEach((box, index) => {
-    const questionEditorInstance = tiptapEditors.find(
-      (editor) => editor.container === box && editor.type === "question"
-    );
-    const questionContent = questionEditorInstance
-      ? questionEditorInstance.editor.getHTML()
-      : "";
+    const questionField = box.querySelector("math-field.question");
+    const questionContent = questionField ? questionField.value.trim() : "";
 
-    const difficulty = box.querySelector(".difficulty").value;
+    const difficulty = box.querySelector(".difficulty")?.value || "medium";
 
     const options = [];
-    box.querySelectorAll(".tiptap-option").forEach((optEl) => {
-      const optionEditorInstance = tiptapEditors.find(
-        (editor) =>
-          editor.container === box &&
-          editor.type === "option" &&
-          editor.editor.options.element === optEl
-      );
-      options.push(optionEditorInstance ? optionEditorInstance.editor.getHTML() : "");
+    box.querySelectorAll("math-field.option").forEach((optField) => {
+      options.push(optField?.value.trim() || "");
     });
 
     questions.push({

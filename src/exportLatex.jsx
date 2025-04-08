@@ -1,17 +1,10 @@
-import { tiptapEditors } from "./editor.jsx";
-import MathExtension from "@aarkue/tiptap-math-extension";
-import "katex/dist/katex.min.css";
-
 export function setupLatexExport() {
   const exportLatexButton = document.getElementById("export-latex");
 
-  // ✅ Prevent duplicate bindings
   const newExportLatexButton = exportLatexButton.cloneNode(true);
   exportLatexButton.parentNode.replaceChild(newExportLatexButton, exportLatexButton);
 
   newExportLatexButton.addEventListener("click", () => {
-    console.log("📜 Exporting LaTeX...");
-
     const title = document.getElementById("doc-title").value.trim() || "Math Questions";
     const author = document.getElementById("doc-author").value.trim() || "Unknown Author";
     const date = document.getElementById("doc-date").value || new Date().toISOString().split("T")[0];
@@ -31,28 +24,15 @@ export function setupLatexExport() {
 `;
 
     document.querySelectorAll(".question-box").forEach((box, index) => {
-      const questionEditorInstance = tiptapEditors.find(
-        (editor) => editor.container === box && editor.type === "question"
-      );
-
-      const question = questionEditorInstance
-        ? escapeLatex(stripHtml(questionEditorInstance.editor.getHTML()))
-        : "";
+      const questionField = box.querySelector("math-field.question");
+      const question = questionField ? escapeLatex(questionField.value.trim()) : "";
 
       const difficulty = box.querySelector(".difficulty")?.value || "medium";
 
       const options = [];
-      box.querySelectorAll(".ck-option").forEach((optionDiv) => {
-        const optionEditorInstance = tiptapEditors.find(
-          (editor) =>
-            editor.container === box &&
-            editor.type === "option" &&
-            editor.editor.options.element === optionDiv
-        );
-        if (optionEditorInstance) {
-          const rawHtml = optionEditorInstance.editor.getHTML();
-          options.push(escapeLatex(stripHtml(rawHtml)));
-        }
+      box.querySelectorAll("math-field.option").forEach((optionField) => {
+        const opt = optionField.value.trim();
+        options.push(escapeLatex(opt));
       });
 
       if (question) {
@@ -77,12 +57,10 @@ export function setupLatexExport() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    console.log("✅ LaTeX file exported successfully!");
   });
 }
 
-// 🔐 Escape LaTeX special characters
+// 🔐 Escape LaTeX characters safely
 function escapeLatex(str) {
   return str
     .replace(/\\/g, "\\textbackslash{}")
@@ -95,13 +73,6 @@ function escapeLatex(str) {
     .replace(/}/g, "\\}")
     .replace(/\^/g, "\\^{}")
     .replace(/~/g, "\\~{}");
-}
-
-// 🧹 Strip HTML safely
-function stripHtml(html) {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  return div.textContent || div.innerText || "";
 }
 
 setupLatexExport();

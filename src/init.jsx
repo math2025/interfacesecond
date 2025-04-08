@@ -1,4 +1,3 @@
-import { createTiptapEditor } from "./editor.jsx";
 import { setupExportListeners } from "./exportJson.jsx";
 import { setupLatexExport } from "./exportLatex.jsx";
 import { setupPdfExport } from "./exportPdf.jsx";
@@ -15,19 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (window.scriptLoaded) return;
   window.scriptLoaded = true;
 
-  console.log("✅ App Initialized");
-
-  // Optional: Placeholder editor at top (not required for each question block)
-  const app = document.getElementById("app");
-  if (app) {
-    const editorContainer = document.createElement("div");
-    app.appendChild(editorContainer);
-
-    createTiptapEditor(
-      editorContainer,
-      "<p>Start writing your math questions...</p>"
-    );
-  }
+  console.log("✅ App Initialized with MathLive");
 
   // Load saved questions from localStorage
   loadSavedQuestions();
@@ -64,8 +51,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Export Setup
-  setupExportListeners();  // 📁 JSON Export
-  setupLatexExport();      // 📜 LaTeX Export
-  setupPdfExport();        // 📄 PDF Export
+  // 🧾 Setup Export Handlers
+  setupExportListeners();  // JSON
+  setupLatexExport();      // LaTeX
+  setupPdfExport();        // PDF
 });

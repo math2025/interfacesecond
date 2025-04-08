@@ -1,7 +1,5 @@
-import { createTiptapEditor } from "./editor.jsx";
 import { showStatusMessage } from "./utils.js";
 
-export let tiptapEditors = [];
 let questionHistory = [];
 
 export function createQuestionBlock(questionData = null) {
@@ -16,13 +14,16 @@ export function createQuestionBlock(questionData = null) {
     "relative"
   );
 
+  // Initial content
   questionBox.innerHTML = `
     <div class="flex justify-between items-start mb-3">
       <label class="block text-gray-700 font-medium">Enter Question:</label>
-      <button class="delete-question">🗑️</button>
+      <button class="delete-question bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600">🗑️</button>
     </div>
 
-    <div class="ck-question">${questionData?.question || ""}</div>
+    <math-field class="question w-full border rounded p-2" virtual-keyboard-mode="manual">
+      ${questionData?.question || ""}
+    </math-field>
 
     <div class="mt-3">
       <input type="file" class="question-image hidden" accept="image/*">
@@ -41,9 +42,9 @@ export function createQuestionBlock(questionData = null) {
 
     <label class="block text-gray-700 font-medium mt-4">Options:</label>
     <div class="options-container mt-2">
-      ${(questionData?.options?.length ? questionData.options : ["", ""]).map((opt, i) => `
+      ${(questionData?.options?.length ? questionData.options : ["", ""]).map((opt) => `
         <div class="flex items-start space-x-2 option-block mb-3">
-          <div class="ck-option w-full">${opt}</div>
+          <math-field class="option w-full border rounded p-2" virtual-keyboard-mode="manual">${opt}</math-field>
           <div class="flex flex-col space-y-1">
             <button class="remove-option bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">❌</button>
             <button class="upload-option-image bg-blue-400 text-white px-2 py-1 rounded hover:bg-blue-500 text-xs">📷</button>
@@ -57,44 +58,37 @@ export function createQuestionBlock(questionData = null) {
     <button class="add-option bg-green-500 text-white px-4 py-2 mt-2 rounded hover:bg-green-600">+ Add Option</button>
   `;
 
+  // Append to container
   document.getElementById("question-container").appendChild(questionBox);
 
-  // Question editor
-  const questionEl = questionBox.querySelector(".ck-question");
-  createTiptapEditor(questionEl, "question", questionBox);
-
-  // Option editors
-  questionBox.querySelectorAll(".ck-option").forEach((el, i) => {
-    createTiptapEditor(el, "option", questionBox, i);
-    attachRemoveOptionHandler(el.closest(".option-block"));
-  });
-
-  // Image upload handlers
+  // 🧹 Question image upload
   questionBox.querySelector(".upload-question-image").addEventListener("click", () => {
     questionBox.querySelector(".question-image").click();
   });
   questionBox.querySelector(".question-image").addEventListener("change", (e) => {
     const reader = new FileReader();
     reader.onload = (ev) => {
-      questionBox.querySelector(".question-image-preview").innerHTML = `<img src="${ev.target.result}" class="w-24 h-24 object-cover">`;
+      questionBox.querySelector(".question-image-preview").innerHTML =
+        `<img src="${ev.target.result}" class="w-24 h-24 object-cover">`;
     };
     reader.readAsDataURL(e.target.files[0]);
   });
 
-  // Delete question
+  // 🗑️ Delete this question
   questionBox.querySelector(".delete-question").addEventListener("click", () => {
     questionBox.remove();
     showStatusMessage("❌ Question deleted!", "error");
   });
 
-  // Add new option
+  // ➕ Add Option
   questionBox.querySelector(".add-option").addEventListener("click", () => {
     const optionsContainer = questionBox.querySelector(".options-container");
+
     const optionDiv = document.createElement("div");
     optionDiv.classList.add("flex", "items-start", "space-x-2", "option-block", "mb-3");
 
     optionDiv.innerHTML = `
-      <div class="ck-option w-full"></div>
+      <math-field class="option w-full border rounded p-2" virtual-keyboard-mode="manual"></math-field>
       <div class="flex flex-col space-y-1">
         <button class="remove-option bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">❌</button>
         <button class="upload-option-image bg-blue-400 text-white px-2 py-1 rounded hover:bg-blue-500 text-xs">📷</button>
@@ -102,36 +96,39 @@ export function createQuestionBlock(questionData = null) {
         <div class="option-image-preview mt-1"></div>
       </div>
     `;
+
     optionsContainer.appendChild(optionDiv);
 
-    const optionElement = optionDiv.querySelector(".ck-option");
-    createTiptapEditor(optionElement, "option", questionBox, optionsContainer.querySelectorAll(".option-block").length - 1);
-    attachRemoveOptionHandler(optionDiv);
-
-    // Option image handling
+    // Image upload for this option
     optionDiv.querySelector(".upload-option-image").addEventListener("click", () => {
       optionDiv.querySelector(".option-image").click();
     });
     optionDiv.querySelector(".option-image").addEventListener("change", (e) => {
       const reader = new FileReader();
       reader.onload = (ev) => {
-        optionDiv.querySelector(".option-image-preview").innerHTML = `<img src="${ev.target.result}" class="w-16 h-16 object-cover">`;
+        optionDiv.querySelector(".option-image-preview").innerHTML =
+          `<img src="${ev.target.result}" class="w-16 h-16 object-cover">`;
       };
       reader.readAsDataURL(e.target.files[0]);
     });
+
+    // ❌ Remove this option
+    attachRemoveOptionHandler(optionDiv);
   });
+
+  // ❌ Attach remove button for each existing option
+  questionBox.querySelectorAll(".option-block").forEach(attachRemoveOptionHandler);
 }
 
-// Helper for option delete
+// ❌ Option removal handler
 function attachRemoveOptionHandler(optionDiv) {
-  const removeBtn = optionDiv.querySelector(".remove-option");
-  removeBtn?.addEventListener("click", () => {
+  optionDiv.querySelector(".remove-option")?.addEventListener("click", () => {
     optionDiv.remove();
     showStatusMessage("❌ Option removed", "error");
   });
 }
 
-// Undo logic (not currently tracking history, just placeholder)
+// 🔄 Undo (optional history)
 export function undoLastAction() {
   const questionContainer = document.getElementById("question-container");
   if (questionHistory.length > 0) {

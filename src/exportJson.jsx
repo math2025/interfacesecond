@@ -1,10 +1,9 @@
-//exportjson.jsx
-import { tiptapEditors } from "./editor.jsx";
+// exportJson.jsx
 
 export function setupExportListeners() {
   const exportJsonButton = document.getElementById("export-json");
 
-  // 🔁 Replace to remove duplicate listeners
+  // Remove duplicate listeners safely
   const newExportJsonButton = exportJsonButton.cloneNode(true);
   exportJsonButton.parentNode.replaceChild(newExportJsonButton, exportJsonButton);
 
@@ -16,31 +15,14 @@ export function setupExportListeners() {
     const questions = [];
 
     document.querySelectorAll(".question-box").forEach((box, index) => {
-      // 📝 Get question HTML from Tiptap instance
-      const questionEditorInstance = tiptapEditors.find(
-        (editor) => editor.container === box && editor.type === "question"
-      );
-
-      const question = questionEditorInstance
-        ? questionEditorInstance.editor.getHTML().trim()
-        : "";
+      const questionField = box.querySelector("math-field.question");
+      const question = questionField ? questionField.value.trim() : "";
 
       const difficulty = box.querySelector(".difficulty").value;
 
-      // ✅ Get options HTML from Tiptap
       const options = [];
-      box.querySelectorAll(".ck-option").forEach((optionDiv) => {
-        const optionEditorInstance = tiptapEditors.find(
-          (editor) =>
-            editor.container === box &&
-            editor.type === "option" &&
-            editor.editor.options.element === optionDiv
-        );
-        if (optionEditorInstance) {
-          options.push(optionEditorInstance.editor.getHTML().trim());
-        } else {
-          options.push("");
-        }
+      box.querySelectorAll("math-field.option").forEach((optField) => {
+        options.push(optField.value.trim());
       });
 
       questions.push({
@@ -51,8 +33,8 @@ export function setupExportListeners() {
       });
     });
 
-    // 📁 Prepare and download JSON
     const jsonData = { title, author, date, questions };
+
     const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
       type: "application/json",
     });

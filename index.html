@@ -3,70 +3,80 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Math Question Builder</title>
+    <title>📘 Math Question Builder</title>
 
-    <!-- KaTeX for Math -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-
-    <!-- Tailwind CSS (Built via Vite or CDN Fallback) -->
+    <!-- Tailwind CSS -->
     <link rel="stylesheet" href="/style.css" />
 
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 
-
-    <!-- Optional: Tailwind CDN fallback for development -->
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <!-- MathLive -->
+    <script type="module">
+      import { MathfieldElement } from 'https://unpkg.com/mathlive?module';
+      customElements.define('math-field', MathfieldElement);
+    </script>
   </head>
 
-  <body class="bg-gray-100 font-sans">
-    <div id="app" class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h1 class="text-3xl font-bold text-center text-blue-700">📖 Math Question Builder</h1>
-      <p class="text-center text-gray-500 mt-2">Easily create, save, and export math questions.</p>
+  <body class="bg-gray-100 font-sans text-gray-800">
+    <main class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-md" id="app">
+      <header class="text-center">
+        <h1 class="text-3xl font-bold text-blue-700">📖 Math Question Builder</h1>
+        <p class="text-gray-500 mt-2">Easily create, save, and export math questions.</p>
+      </header>
 
       <!-- Status Message -->
       <div id="status-message" class="hidden mt-4 p-2 rounded text-center"></div>
 
       <!-- Document Metadata -->
-      <div class="mt-6 space-y-4">
+      <section class="mt-6 space-y-4">
         <div>
-          <label class="font-semibold">📌 Document Title:</label>
+          <label for="doc-title" class="font-semibold">📌 Document Title:</label>
           <input type="text" id="doc-title" placeholder="Enter title..." />
         </div>
         <div>
-          <label class="font-semibold">👤 Author:</label>
+          <label for="doc-author" class="font-semibold">👤 Author:</label>
           <input type="text" id="doc-author" placeholder="Enter author name..." />
         </div>
         <div>
-          <label class="font-semibold">📅 Date:</label>
+          <label for="doc-date" class="font-semibold">📅 Date:</label>
           <input type="date" id="doc-date" />
         </div>
-      </div>
+      </section>
 
       <!-- Question Container -->
-      <div id="question-container" class="mt-6 space-y-4"></div>
+      <section id="question-container" class="mt-6 space-y-4"></section>
 
-      <!-- Buttons -->
+      <!-- Question Action Buttons -->
       <div class="flex justify-between mt-6 gap-4">
-        <button id="add-question" class="add-question bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">➕ Add Question</button>
-        <button id="undo-action" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">🔄 Undo Last Action</button>
+        <button id="add-question" class="add-question bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          ➕ Add Question
+        </button>
+        <button id="undo-action" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+          🔄 Undo Last Action
+        </button>
       </div>
 
       <!-- Export Buttons -->
-      <div class="export-buttons grid grid-cols-2 gap-4 mt-6">
+      <section class="export-buttons grid grid-cols-2 gap-4 mt-6">
         <button id="save-progress" class="export-json">💾 Save Progress</button>
         <button id="export-json" class="export-json">📁 Export JSON</button>
         <button id="export-latex" class="export-latex">📜 Export LaTeX</button>
         <button id="export-pdf" class="export-pdf">📄 Export PDF</button>
-        <button id="reset-page" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 col-span-2">🔄 Reset</button>
-      </div>
+        <button id="reset-page" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 col-span-2">
+          🔄 Reset
+        </button>
+      </section>
 
       <!-- Help Link -->
-      <div class="text-center mt-6">
+      <footer class="text-center mt-6">
         <a href="help.html" class="text-blue-500 underline hover:text-blue-700">📖 Need Help?</a>
-      </div>
-    </div>
+      </footer>
+    </main>
 
-    <!-- Entry Point -->
+    <!-- App Entry Point -->
     <script type="module" src="/src/index.jsx"></script>
   </body>
 </html>

@@ -1,3 +1,5 @@
+//utils.js
+
 // ✅ Generate clean file name from metadata
 export function generateFileName(fileType) {
   let title =
