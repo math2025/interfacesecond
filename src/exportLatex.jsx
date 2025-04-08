@@ -23,7 +23,9 @@ export function setupLatexExport() {
 \\begin{enumerate}
 `;
 
-    document.querySelectorAll(".question-box").forEach((box, index) => {
+    const boxes = document.querySelectorAll(".question-box");
+
+    boxes.forEach((box, index) => {
       const questionField = box.querySelector("math-field.question");
       const question = questionField ? escapeLatex(questionField.value.trim()) : "";
 

@@ -25,7 +25,9 @@
     "@tiptap/starter-kit": "^2.0.0",
     "esbuild": "^0.25.2",
     "katex": "^0.16.8",
-    "mathlive": "^0.105.0"
+    "mathlive": "^0.105.0",
+    "pdf-lib": "^1.17.1",
+    "sortablejs": "^1.15.6"
   },
   "keywords": []
 }

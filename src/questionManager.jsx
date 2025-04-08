@@ -1,6 +1,20 @@
 import { showStatusMessage } from "./utils.js";
+import Sortable from "sortablejs"; // ✅ New import
 
 let questionHistory = [];
+
+// 🔄 Initialize SortableJS once
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById("question-container");
+  if (container && !container.dataset.sortableApplied) {
+    Sortable.create(container, {
+      handle: ".drag-handle",
+      animation: 150,
+      ghostClass: "opacity-50",
+    });
+    container.dataset.sortableApplied = true;
+  }
+});
 
 export function createQuestionBlock(questionData = null) {
   const questionBox = document.createElement("div");
@@ -11,13 +25,17 @@ export function createQuestionBlock(questionData = null) {
     "rounded-lg",
     "shadow-sm",
     "mt-4",
-    "relative"
+    "relative",
+    "cursor-move"
   );
 
-  // Initial content
+  // ✨ Drag handle
   questionBox.innerHTML = `
     <div class="flex justify-between items-start mb-3">
-      <label class="block text-gray-700 font-medium">Enter Question:</label>
+      <div class="flex items-center gap-2">
+        <span class="drag-handle text-xl cursor-grab hover:opacity-70">⋮⋮</span>
+        <label class="block text-gray-700 font-medium">Enter Question:</label>
+      </div>
       <button class="delete-question bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600">🗑️</button>
     </div>
 
@@ -58,10 +76,9 @@ export function createQuestionBlock(questionData = null) {
     <button class="add-option bg-green-500 text-white px-4 py-2 mt-2 rounded hover:bg-green-600">+ Add Option</button>
   `;
 
-  // Append to container
   document.getElementById("question-container").appendChild(questionBox);
 
-  // 🧹 Question image upload
+  // 🖼️ Image Upload - Question
   questionBox.querySelector(".upload-question-image").addEventListener("click", () => {
     questionBox.querySelector(".question-image").click();
   });
@@ -74,7 +91,7 @@ export function createQuestionBlock(questionData = null) {
     reader.readAsDataURL(e.target.files[0]);
   });
 
-  // 🗑️ Delete this question
+  // ❌ Delete this question
   questionBox.querySelector(".delete-question").addEventListener("click", () => {
     questionBox.remove();
     showStatusMessage("❌ Question deleted!", "error");
@@ -99,7 +116,7 @@ export function createQuestionBlock(questionData = null) {
 
     optionsContainer.appendChild(optionDiv);
 
-    // Image upload for this option
+    // 🖼️ Image upload
     optionDiv.querySelector(".upload-option-image").addEventListener("click", () => {
       optionDiv.querySelector(".option-image").click();
     });
@@ -112,15 +129,14 @@ export function createQuestionBlock(questionData = null) {
       reader.readAsDataURL(e.target.files[0]);
     });
 
-    // ❌ Remove this option
     attachRemoveOptionHandler(optionDiv);
   });
 
-  // ❌ Attach remove button for each existing option
+  // 🧹 Option delete setup
   questionBox.querySelectorAll(".option-block").forEach(attachRemoveOptionHandler);
 }
 
-// ❌ Option removal handler
+// ❌ Option remove logic
 function attachRemoveOptionHandler(optionDiv) {
   optionDiv.querySelector(".remove-option")?.addEventListener("click", () => {
     optionDiv.remove();
@@ -128,7 +144,7 @@ function attachRemoveOptionHandler(optionDiv) {
   });
 }
 
-// 🔄 Undo (optional history)
+// 🔄 Undo Placeholder
 export function undoLastAction() {
   const questionContainer = document.getElementById("question-container");
   if (questionHistory.length > 0) {

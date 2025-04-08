@@ -1,5 +1,7 @@
 import { showStatusMessage, generateFileName } from "./utils.js";
 import "katex/dist/katex.min.css";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+
 
 export async function setupPdfExport() {
   let exportPdfButton = document.getElementById("export-pdf");
@@ -8,14 +10,15 @@ export async function setupPdfExport() {
   const newButton = exportPdfButton.cloneNode(true);
   exportPdfButton.parentNode.replaceChild(newButton, exportPdfButton);
   exportPdfButton = newButton;
+  console.log("111");
 
   exportPdfButton.addEventListener("click", async () => {
+    console.log("222");
     try {
-      const { PDFDocument, rgb, StandardFonts } = PDFLib;
-
-      const templateBytes = await fetch("template.pdf").then((res) =>
-        res.arrayBuffer()
-      );
+     // const { PDFDocument, rgb, StandardFonts } = PDFLib;
+     
+      const templateBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
+      console.log("333");
       const templateDoc = await PDFDocument.load(templateBytes);
       const [templatePage] = await templateDoc.getPages();
 
@@ -23,13 +26,9 @@ export async function setupPdfExport() {
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
       const templatePageEmbed = await pdfDoc.embedPage(templatePage);
 
-      const docTitle =
-        document.getElementById("doc-title").value.trim() || "Untitled";
-      const docAuthor =
-        document.getElementById("doc-author").value.trim() || "Unknown";
-      const docDate =
-        document.getElementById("doc-date").value ||
-        new Date().toISOString().split("T")[0];
+      const docTitle = document.getElementById("doc-title").value.trim() || "Untitled";
+      const docAuthor = document.getElementById("doc-author").value.trim() || "Unknown";
+      const docDate = document.getElementById("doc-date").value || new Date().toISOString().split("T")[0];
 
       let pages = [];
       let y = 720;
@@ -38,9 +37,8 @@ export async function setupPdfExport() {
         const page = pdfDoc.addPage([595, 842]);
         page.drawPage(templatePageEmbed);
 
-        const titleWidth = font.widthOfTextAtSize(docTitle, 16);
         page.drawText(docTitle, {
-          x: (595 - titleWidth) / 2,
+          x: (595 - font.widthOfTextAtSize(docTitle, 16)) / 2,
           y: 790,
           size: 16,
           font,
@@ -71,10 +69,10 @@ export async function setupPdfExport() {
       let currentPage = addNewPage();
 
       const questionBoxes = document.querySelectorAll(".question-box");
+
       questionBoxes.forEach((box, index) => {
         const questionField = box.querySelector("math-field.question");
         const questionLatex = questionField?.value?.trim() || "";
-
         const difficulty = box.querySelector(".difficulty")?.value || "medium";
 
         const options = [];
@@ -139,7 +137,7 @@ export async function setupPdfExport() {
   });
 }
 
-// Strip LaTeX formatting for raw text fallback
+// 🧽 Strip LaTeX commands for plain fallback
 function stripLatex(latex) {
   return latex
     .replace(/\\[a-zA-Z]+/g, "")
