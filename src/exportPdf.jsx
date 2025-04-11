@@ -1,24 +1,18 @@
 import { showStatusMessage, generateFileName } from "./utils.js";
-import "katex/dist/katex.min.css";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-
+import { ckeditors } from "./editor.jsx";
 
 export async function setupPdfExport() {
-  let exportPdfButton = document.getElementById("export-pdf");
+  const exportPdfButton = document.getElementById("export-pdf");
   if (!exportPdfButton) return;
 
   const newButton = exportPdfButton.cloneNode(true);
   exportPdfButton.parentNode.replaceChild(newButton, exportPdfButton);
-  exportPdfButton = newButton;
-  console.log("111");
 
-  exportPdfButton.addEventListener("click", async () => {
-    console.log("222");
+  newButton.addEventListener("click", async () => {
     try {
-     // const { PDFDocument, rgb, StandardFonts } = PDFLib;
-     
-      const templateBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
-      console.log("333");
+      // Load PDF template
+      const templateBytes = await fetch("/template.pdf").then(res => res.arrayBuffer());
       const templateDoc = await PDFDocument.load(templateBytes);
       const [templatePage] = await templateDoc.getPages();
 
@@ -37,6 +31,7 @@ export async function setupPdfExport() {
         const page = pdfDoc.addPage([595, 842]);
         page.drawPage(templatePageEmbed);
 
+        // Header
         page.drawText(docTitle, {
           x: (595 - font.widthOfTextAtSize(docTitle, 16)) / 2,
           y: 790,
@@ -68,19 +63,28 @@ export async function setupPdfExport() {
 
       let currentPage = addNewPage();
 
-      const questionBoxes = document.querySelectorAll(".question-box");
+      // Group CKEditor instances
+      const grouped = {};
+      ckeditors.forEach(({ type, editor }) => {
+        const container = editor.sourceElement.closest(".question-box");
+        if (!container) return;
 
-      questionBoxes.forEach((box, index) => {
-        const questionField = box.querySelector("math-field.question");
-        const questionLatex = questionField?.value?.trim() || "";
-        const difficulty = box.querySelector(".difficulty")?.value || "medium";
+        if (!grouped[container]) {
+          grouped[container] = { container, question: "", options: [] };
+        }
 
-        const options = [];
-        box.querySelectorAll("math-field.option").forEach((opt) => {
-          options.push(opt.value.trim());
-        });
+        if (type === "question") {
+          grouped[container].question = editor.getData();
+        } else if (type === "option") {
+          grouped[container].options.push(editor.getData());
+        }
+      });
 
-        const questionText = `${index + 1}. ${stripLatex(questionLatex)} (${difficulty})`;
+      let questionNumber = 1;
+      for (const key in grouped) {
+        const { container, question, options } = grouped[key];
+        const difficulty = container.querySelector(".difficulty")?.value || "medium";
+        const questionText = `${questionNumber}. ${stripHtml(question)} (${difficulty})`;
 
         if (y < 120) currentPage = addNewPage();
 
@@ -94,8 +98,8 @@ export async function setupPdfExport() {
         y -= 20;
 
         options.forEach((opt, i) => {
-          const label = String.fromCharCode(97 + i);
-          currentPage.drawText(`   (${label}) ${stripLatex(opt)}`, {
+          const label = String.fromCharCode(97 + i); // a, b, c...
+          currentPage.drawText(`   (${label}) ${stripHtml(opt)}`, {
             x: 70,
             y,
             size: 10,
@@ -106,8 +110,10 @@ export async function setupPdfExport() {
         });
 
         y -= 10;
-      });
+        questionNumber++;
+      }
 
+      // Add page numbers
       pages.forEach((page, i) => {
         const footer = `Page ${i + 1}`;
         const width = font.widthOfTextAtSize(footer, 10);
@@ -120,6 +126,7 @@ export async function setupPdfExport() {
         });
       });
 
+      // Save & Download
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const link = document.createElement("a");
@@ -137,13 +144,11 @@ export async function setupPdfExport() {
   });
 }
 
-// 🧽 Strip LaTeX commands for plain fallback
-function stripLatex(latex) {
-  return latex
-    .replace(/\\[a-zA-Z]+/g, "")
-    .replace(/[{}$]/g, "")
-    .replace(/_/g, " ")
-    .trim();
+// 🧽 Clean HTML tags to plain text
+function stripHtml(html) {
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || "";
 }
 
 setupPdfExport();

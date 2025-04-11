@@ -1,7 +1,3 @@
-option delete and image features are not working for default option A and option B
-
 Math equation binding with ck editor (bugs in export pdf and export json)
 
-add page numbers to pdf exported dynamically
-
-add unidue question ids in json file.
+add unique question ids in json file.

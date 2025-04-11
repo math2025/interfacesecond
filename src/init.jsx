@@ -9,50 +9,50 @@ import {
 } from "./storage.js";
 import { showStatusMessage } from "./utils.js";
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Avoid duplicate initialization
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔁 Prevent duplicate execution
   if (window.scriptLoaded) return;
   window.scriptLoaded = true;
 
-  console.log("✅ App Initialized with MathLive");
+  console.log("✅ App Initialized with CKEditor + MathType");
 
-  // Load saved questions from localStorage
+  // 🧠 Load saved questions from localStorage
   loadSavedQuestions();
 
-  // Add a default question block if none exist
+  // ➕ Add initial question if none exist
   const questionContainer = document.getElementById("question-container");
   if (questionContainer && questionContainer.children.length === 0) {
     createQuestionBlock();
   }
 
-  // ➕ Add Question Button
+  // ➕ Add Question
   document.getElementById("add-question")?.addEventListener("click", () => {
     createQuestionBlock();
     showStatusMessage("✅ Question added!");
   });
 
-  // 🔄 Undo Button
+  // 🔄 Undo
   document.getElementById("undo-action")?.addEventListener("click", () => {
     undoLastAction();
     showStatusMessage("🔄 Last action undone!");
   });
 
-  // 💾 Save Button
+  // 💾 Save Progress
   document.getElementById("save-progress")?.addEventListener("click", () => {
     saveQuestionsToLocal();
-    showStatusMessage("✅ Progress saved successfully!");
+    showStatusMessage("✅ Progress saved!");
   });
 
-  // ♻️ Reset Page Button
+  // ♻️ Reset
   document.getElementById("reset-page")?.addEventListener("click", () => {
     if (confirm("⚠️ Are you sure you want to reset everything?")) {
       resetAll();
-      showStatusMessage("🔄 Page reset successfully!");
+      showStatusMessage("🔄 Page reset.");
     }
   });
 
-  // 🧾 Setup Export Handlers
-  setupExportListeners();  // JSON
-  setupLatexExport();      // LaTeX
-  setupPdfExport();        // PDF
+  // 📤 Setup export handlers (JSON, LaTeX, PDF)
+  setupExportListeners();
+  setupLatexExport();
+  setupPdfExport();
 });

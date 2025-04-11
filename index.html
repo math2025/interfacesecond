@@ -5,49 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>📘 Math Question Builder</title>
 
-    <!-- Tailwind CSS -->
+    <!-- ✅ Tailwind CSS -->
     <link rel="stylesheet" href="/style.css" />
 
-    <!-- KaTeX Styles -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
-    />
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"
-    ></script>
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
-    ></script>
+    <!-- ✅ KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 
-    <!-- MathLive (WYSIWYG Math Input) -->
-    <script type="module">
-      import { MathfieldElement } from 'https://unpkg.com/mathlive?module';
-      customElements.define('math-field', MathfieldElement);
-    </script>
-
-    <!-- SortableJS for Drag & Drop -->
+    <!-- ✅ SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <!-- ✅ CKEditor and MathType are loaded via ES module bundling from Vite -->
   </head>
 
   <body class="bg-gray-100 text-gray-800 font-sans transition-all dark:bg-slate-900 dark:text-slate-200">
-    <main
-      id="app"
-      class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-md dark:bg-slate-800"
-    >
-      <!-- Header -->
-      <header class="flex items-center justify-between mb-4">
-        <!-- Left: Heading and Subtitle -->
+    <main id="app" class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-md dark:bg-slate-800">
+      
+      <!-- 🔹 Header with Theme Toggle -->
+      <header class="flex items-center justify-between mb-6">
         <div>
           <h1 class="text-3xl font-bold text-blue-700 dark:text-blue-400">📖 Math Question Builder</h1>
-          <p class="text-gray-500 mt-1 dark:text-gray-300">
-            Easily create, save, and export math questions.
-          </p>
+          <p class="text-gray-500 dark:text-gray-300">Easily create, save, and export math questions.</p>
         </div>
-
-        <!-- Right: Theme Toggle -->
         <button
           id="theme-toggle-icon"
           class="text-2xl p-2 rounded-full transition-all hover:scale-110 dark:text-yellow-300 text-blue-600"
@@ -57,18 +37,18 @@
         </button>
       </header>
 
-      <!-- Status Message -->
-      <div id="status-message" class="hidden mt-4 p-2 rounded text-center"></div>
+      <!-- 🔹 Status Message -->
+      <div id="status-message" class="hidden mt-2 p-2 rounded text-center"></div>
 
-      <!-- Document Metadata -->
-      <section class="mt-6 space-y-4">
+      <!-- 🔹 Metadata Inputs -->
+      <section class="space-y-4">
         <div>
-          <label for="doc-title" class="font-semibold">📌 Document Title:</label>
+          <label for="doc-title" class="font-semibold">📌 Title:</label>
           <input type="text" id="doc-title" placeholder="Enter title..." />
         </div>
         <div>
           <label for="doc-author" class="font-semibold">👤 Author:</label>
-          <input type="text" id="doc-author" placeholder="Enter author name..." />
+          <input type="text" id="doc-author" placeholder="Enter author..." />
         </div>
         <div>
           <label for="doc-date" class="font-semibold">📅 Date:</label>
@@ -76,54 +56,42 @@
         </div>
       </section>
 
-      <!-- Question Container -->
+      <!-- 🔹 Dynamic Questions -->
       <section id="question-container" class="mt-6 space-y-4"></section>
 
-      <!-- Question Actions -->
+      <!-- 🔹 Action Controls -->
       <div class="flex justify-between mt-6 gap-4">
-        <button
-          id="add-question"
-          class="add-question bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
+        <button id="add-question" class="add-question bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
           ➕ Add Question
         </button>
-        <button
-          id="undo-action"
-          class="undo-action bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-        >
-          🔄 Undo Last Action
+        <button id="undo-action" class="undo-action bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+          🔄 Undo
         </button>
       </div>
 
-      <!-- Sticky Export Bar -->
+      <!-- 🔹 Export Controls -->
       <section class="export-buttons grid grid-cols-2 gap-4 mt-6 sticky bottom-0 py-4 bg-gray-100 dark:bg-slate-800 z-50 border-t dark:border-slate-700">
-        <button id="save-progress" class="export-json">💾 Save Progress</button>
+        <button id="save-progress" class="export-json">💾 Save</button>
         <button id="export-json" class="export-json">📁 Export JSON</button>
         <button id="export-latex" class="export-latex">📜 Export LaTeX</button>
         <button id="export-pdf" class="export-pdf">📄 Export PDF</button>
-        <button
-          id="reset-page"
-          class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 col-span-2"
-        >
-          🔄 Reset
+        <button id="reset-page" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 col-span-2">
+          ♻️ Reset All
         </button>
       </section>
 
-      <!-- Help Footer -->
+      <!-- 🔹 Footer -->
       <footer class="text-center mt-6">
-        <a
-          href="help.html"
-          class="text-blue-500 underline hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500"
-        >
+        <a href="help.html" class="text-blue-500 underline hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500">
           📖 Need Help?
         </a>
       </footer>
     </main>
 
-    <!-- App Entry -->
+    <!-- ✅ App Logic -->
     <script type="module" src="/src/index.jsx"></script>
 
-    <!-- Theme Toggle Script -->
+    <!-- ✅ Theme Toggle Script -->
     <script>
       const themeToggleBtn = document.getElementById("theme-toggle-icon");
       const htmlEl = document.documentElement;
@@ -142,7 +110,7 @@
       });
     </script>
 
-    <!-- SortableJS Activation -->
+    <!-- ✅ SortableJS Initialization -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         new Sortable(document.getElementById("question-container"), {
@@ -154,3 +122,4 @@
     </script>
   </body>
 </html>
+<!-- End of index.html -->

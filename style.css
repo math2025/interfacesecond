@@ -1,22 +1,23 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ========= Base Styling ========= */
+/* ========== Base Styling ========== */
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f8fafc;
   color: #1f2937;
+  transition: background 0.3s ease, color 0.3s ease;
   margin: 0;
   padding: 0;
-  transition: background 0.3s ease, color 0.3s ease;
 }
 .dark body {
   background-color: #0f172a;
   color: #e2e8f0;
 }
 
-/* ========= Container ========= */
+/* ========== Container ========== */
 .container {
   max-width: 960px;
   margin: 40px auto;
@@ -30,24 +31,24 @@ body {
   background-color: #1e293b;
 }
 
-/* ========= Typography ========= */
+/* ========== Typography ========== */
 h1 {
   font-size: 2.5rem;
-  color: #2563eb;
   font-weight: 700;
+  color: #2563eb;
 }
 .dark h1 {
   color: #60a5fa;
 }
 p {
-  color: #6b7280;
   font-size: 1rem;
+  color: #6b7280;
 }
 .dark p {
   color: #94a3b8;
 }
 
-/* ========= Inputs & Selects ========= */
+/* ========== Form Elements ========== */
 input, select {
   width: 100%;
   padding: 10px;
@@ -70,7 +71,7 @@ input:focus, select:focus {
   border-color: #475569;
 }
 
-/* ========= Question Box ========= */
+/* ========== Question Box ========== */
 .question-box {
   background-color: #f9fafb;
   border: 1px solid #e5e7eb;
@@ -85,9 +86,8 @@ input:focus, select:focus {
   border-color: #334155;
 }
 
-/* Drag and drop styling */
 .question-box.sortable-chosen {
-  opacity: 0.7;
+  opacity: 0.75;
 }
 .question-box.sortable-ghost {
   background: #e0f2fe;
@@ -95,35 +95,47 @@ input:focus, select:focus {
   transform: scale(1.02);
 }
 
-/* ========= Editor Area ========= */
-.editor-wrapper {
-  background-color: #eff6ff;
-  border: 1px solid #cbd5e1;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
+math-field.question {
+  min-height: 140px;
+  font-size: 1.15rem;
+  padding: 14px;
+  line-height: 1.7;
+  width: 100%;
+  border-radius: 10px;
 }
-.dark .editor-wrapper {
+math-field.option {
+  min-height: 80px;
+  font-size: 1rem;
+  padding: 10px 14px;
+  line-height: 1.6;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.katex-preview {
+  font-size: 1rem;
+  color: #1e293b;
+  border: 1px dashed #cbd5e1;
+  margin-top: 6px;
+  padding: 6px;
+  background-color: #f1f5f9;
+}
+.dark .katex-preview {
+  color: #e2e8f0;
   background-color: #334155;
   border-color: #475569;
 }
-
-.ProseMirror {
-  min-height: 100px;
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 6px;
-  background-color: #ffffff;
-  border: none;
-  outline: none;
-  transition: background 0.3s ease;
+.math-highlight {
+  background-color: #fef08a;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
 }
-.dark .ProseMirror {
-  background-color: #0f172a;
-  color: #e2e8f0;
+.dark .math-highlight {
+  background-color: #fde68a;
+  color: #f8fafc;
 }
 
-/* ========= Buttons ========= */
 button {
   transition: all 0.2s ease;
   font-size: 0.95rem;
@@ -136,10 +148,15 @@ button:hover {
   transform: translateY(-1px);
   opacity: 0.95;
 }
-.add-question { background-color: #2563eb; color: #fff; }
-.undo-action { background-color: #ef4444; color: #fff; }
+.add-question {
+  background-color: #2563eb;
+  color: #fff;
+}
+.undo-action {
+  background-color: #ef4444;
+  color: #fff;
+}
 
-/* ========= Export Buttons ========= */
 .export-buttons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -167,34 +184,6 @@ button:hover {
 #save-progress { background-color: #10b981; }
 #reset-page { background-color: #d97706; }
 
-/* ========= Math Features ========= */
-.insert-math-btn {
-  background-color: #ede9fe;
-  color: #5b21b6;
-  font-size: 0.85rem;
-  padding: 6px 10px;
-  border-radius: 5px;
-  border: 1px solid #ddd6fe;
-  margin-bottom: 6px;
-}
-.insert-math-btn:hover {
-  background-color: #ddd6fe;
-}
-.katex-preview {
-  font-size: 1rem;
-  color: #1e293b;
-  border: 1px dashed #cbd5e1;
-  margin-top: 6px;
-  padding: 6px;
-  background-color: #f1f5f9;
-}
-.dark .katex-preview {
-  color: #e2e8f0;
-  background-color: #334155;
-  border-color: #475569;
-}
-
-/* ========= File Uploads ========= */
 input[type="file"] {
   background: white;
   border: 1px solid #d1d5db;
@@ -207,20 +196,32 @@ input[type="file"] {
   border-color: #475569;
 }
 
-/* ========= LaTeX Highlight ========= */
-.math-highlight {
-  background-color: #fef08a;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-family: monospace;
-  color: #374151;
+.insert-math-btn {
+  background-color: #ede9fe;
+  color: #5b21b6;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border: 1px solid #ddd6fe;
+  border-radius: 6px;
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  z-index: 10;
 }
-.dark .math-highlight {
-  background-color: #fde68a;
-  color: #f8fafc;
+.insert-math-btn:hover {
+  background-color: #ddd6fe;
+}
+.dark .insert-math-btn {
+  background-color: #3f3cbb;
+  color: #fff;
+  border-color: #5b21b6;
 }
 
-/* ========= Animations ========= */
+.option-block {
+  max-width: 95%;
+  margin-left: 0.5rem;
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -232,7 +233,6 @@ input[type="file"] {
   }
 }
 
-/* ========= Mobile Responsive ========= */
 @media (max-width: 768px) {
   .container {
     padding: 20px;
@@ -249,82 +249,4 @@ input[type="file"] {
   .question-box {
     padding: 16px;
   }
-}
-/* ========= Enlarged MathField Inputs ========= */
-math-field.question {
-    min-height: 140px;
-    font-size: 1.1rem;
-    padding: 14px 14px;
-    border-radius: 10px;
-    line-height: 1.7;
-    width: 100%;
-  }
-  
-  math-field.option {
-    min-height: 80px;
-    font-size: 1rem;
-    padding: 10px 14px;
-    border-radius: 8px;
-    line-height: 1.6;
-    width: 100%;
-  }
-  
-  /* ========= Editor Container Layout ========= */
-  .editor-wrapper {
-    position: relative;
-    padding-top: 44px;
-  }
-  
-  /* ========= WYSIWYG Math Button ========= */
-  .insert-math-btn {
-    position: absolute;
-    top: 8px;
-    left: 10px;
-    z-index: 10;
-    font-size: 0.85rem;
-    padding: 6px 10px;
-    background-color: #ede9fe;
-    color: #5b21b6;
-    border: 1px solid #ddd6fe;
-    border-radius: 6px;
-  }
-  .insert-math-btn:hover {
-    background-color: #ddd6fe;
-  }
-  .dark .insert-math-btn {
-    background-color: #3f3cbb;
-    color: #fff;
-    border-color: #5b21b6;
-  }
-  
-  /* ========= Question vs Option Block Widths ========= */
-  .question-box {
-    width: 100%;
-    max-width: 100%;
-  }
-  .option-block {
-    max-width: 95%;
-    margin-left: 0.5rem;
-  }
-  
-.insert-math-btn {
-  position: absolute;
-  top: 8px;
-  left: 10px;
-  z-index: 10;
-  font-size: 0.85rem;
-  padding: 6px 10px;
-  background-color: #ede9fe;
-  color: #5b21b6;
-  border: 1px solid #ddd6fe;
-  border-radius: 6px;
-}
-.insert-math-btn:hover {
-  background-color: #ddd6fe;
-}
-
-.dark .insert-math-btn {
-  background-color: #3f3cbb;
-  color: #fff;
-  border-color: #5b21b6;
 }

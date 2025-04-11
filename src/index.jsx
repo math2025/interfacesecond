@@ -1,21 +1,26 @@
 import "../style.css";
-import "./init.jsx"; // Load app logic
+import "./init.jsx"; // Initialize full app logic
 
-// ✅ Register MathLive globally (for WYSIWYG math editing)
-import { MathfieldElement } from "mathlive";
-customElements.define("math-field", MathfieldElement);
+document.addEventListener("DOMContentLoaded", () => {
+  const root = document.documentElement;
+  const savedTheme = localStorage.getItem("theme");
 
-// ✅ Auto apply saved dark mode theme on hydration
-const savedTheme = localStorage.getItem("theme");
-const root = document.documentElement;
-if (savedTheme === "dark") {
-  root.classList.add("dark");
-} else {
-  root.classList.remove("dark");
-}
+  // 🌙 Apply saved theme
+  if (savedTheme === "dark") {
+    root.classList.add("dark");
+  } else {
+    root.classList.remove("dark");
+  }
 
-// 🌓 Optional: Set correct icon on reload
-const themeBtn = document.getElementById("theme-toggle-icon");
-if (themeBtn) {
-  themeBtn.textContent = savedTheme === "dark" ? "🌞" : "🌙";
-}
+  // 🌞 Update theme toggle icon
+  const themeBtn = document.getElementById("theme-toggle-icon");
+  if (themeBtn) {
+    themeBtn.textContent = savedTheme === "dark" ? "🌞" : "🌙";
+
+    themeBtn.addEventListener("click", () => {
+      const isDark = root.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      themeBtn.textContent = isDark ? "🌞" : "🌙";
+    });
+  }
+});

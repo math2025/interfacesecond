@@ -1,6 +1,7 @@
-import { createQuestionBlock } from "./questionManager.jsx";
+import { createQuestionBlock, ckeditors } from "./questionManager.jsx";
 import { showStatusMessage } from "./utils.js";
 
+// 💾 Save CKEditor-based content to localStorage
 export function saveQuestionsToLocal() {
   const title = document.getElementById("doc-title").value.trim();
   const author = document.getElementById("doc-author").value.trim();
@@ -9,20 +10,29 @@ export function saveQuestionsToLocal() {
   const questions = [];
 
   document.querySelectorAll(".question-box").forEach((box, index) => {
-    const questionField = box.querySelector("math-field.question");
-    const questionContent = questionField ? questionField.value.trim() : "";
-
     const difficulty = box.querySelector(".difficulty")?.value || "medium";
 
-    const options = [];
-    box.querySelectorAll("math-field.option").forEach((optField) => {
-      options.push(optField?.value.trim() || "");
-    });
+    // Get question editor instance
+    const questionEditor = ckeditors.find(
+      (e) => e.container === box && e.type === "question"
+    );
+    const questionHTML = questionEditor ? questionEditor.editor.getData().trim() : "";
+
+    // Get option editor instances
+    const optionEditors = ckeditors.filter(
+      (e) => e.container === box && e.type === "option"
+    );
+    const options = optionEditors.map((opt) => opt.editor.getData().trim());
+
+    // Optional: store image base64 for question if exists
+    const imgEl = box.querySelector(".question-image-preview img");
+    const image = imgEl ? imgEl.src : "";
 
     questions.push({
       question_number: index + 1,
-      question: questionContent,
+      question: questionHTML,
       difficulty,
+      image,
       options,
     });
   });
@@ -32,6 +42,7 @@ export function saveQuestionsToLocal() {
   showStatusMessage("✅ Progress saved successfully!");
 }
 
+// 🔄 Load from localStorage
 export function loadSavedQuestions() {
   const savedData = JSON.parse(localStorage.getItem("savedQuestions"));
   if (!savedData) return;
@@ -43,12 +54,13 @@ export function loadSavedQuestions() {
   savedData.questions.forEach((q) => createQuestionBlock(q));
 }
 
+// ♻️ Reset everything
 export function resetAll() {
   localStorage.removeItem("savedQuestions");
   document.getElementById("doc-title").value = "";
   document.getElementById("doc-author").value = "";
   document.getElementById("doc-date").value = "";
   document.getElementById("question-container").innerHTML = "";
-  createQuestionBlock();
+  createQuestionBlock(); // Add a fresh block
   showStatusMessage("🔄 Page reset successfully!", "success");
 }

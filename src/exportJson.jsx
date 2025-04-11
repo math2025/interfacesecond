@@ -1,9 +1,9 @@
-// exportJson.jsx
+import { ckeditors } from "./editor.jsx";
 
 export function setupExportListeners() {
   const exportJsonButton = document.getElementById("export-json");
 
-  // Remove duplicate listeners safely
+  // 🔄 Replace to prevent duplicate listeners
   const newExportJsonButton = exportJsonButton.cloneNode(true);
   exportJsonButton.parentNode.replaceChild(newExportJsonButton, exportJsonButton);
 
@@ -15,19 +15,24 @@ export function setupExportListeners() {
     const questions = [];
 
     document.querySelectorAll(".question-box").forEach((box, index) => {
-      const questionField = box.querySelector("math-field.question");
-      const question = questionField ? questionField.value.trim() : "";
+      const difficulty = box.querySelector(".difficulty")?.value || "medium";
 
-      const difficulty = box.querySelector(".difficulty").value;
+      // 🧠 Find the CKEditor instance for this question
+      const questionEditorEntry = ckeditors.find(
+        (entry) => entry.type === "question" && entry.editor.sourceElement.closest(".question-box") === box
+      );
+      const questionHTML = questionEditorEntry ? questionEditorEntry.editor.getData().trim() : "";
 
-      const options = [];
-      box.querySelectorAll("math-field.option").forEach((optField) => {
-        options.push(optField.value.trim());
-      });
+      // 🧠 Find option editors within this box
+      const optionEditors = ckeditors.filter(
+        (entry) => entry.type === "option" && entry.editor.sourceElement.closest(".question-box") === box
+      );
+
+      const options = optionEditors.map((entry) => entry.editor.getData().trim());
 
       questions.push({
         question_number: index + 1,
-        question,
+        question: questionHTML,
         difficulty,
         options,
       });

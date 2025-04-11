@@ -1,3 +1,5 @@
+import { ckeditors } from "./editor.jsx";
+
 export function setupLatexExport() {
   const exportLatexButton = document.getElementById("export-latex");
 
@@ -23,31 +25,29 @@ export function setupLatexExport() {
 \\begin{enumerate}
 `;
 
-    const boxes = document.querySelectorAll(".question-box");
-
-    boxes.forEach((box, index) => {
-      const questionField = box.querySelector("math-field.question");
-      const question = questionField ? escapeLatex(questionField.value.trim()) : "";
+    document.querySelectorAll(".question-box").forEach((box, index) => {
+      const questionEditor = ckeditors.find(
+        (e) => e.type === "question" && e.editor.sourceElement.closest(".question-box") === box
+      );
+      const questionHTML = questionEditor ? questionEditor.editor.getData() : "";
+      const questionLatex = htmlToLatex(questionHTML);
 
       const difficulty = box.querySelector(".difficulty")?.value || "medium";
 
-      const options = [];
-      box.querySelectorAll("math-field.option").forEach((optionField) => {
-        const opt = optionField.value.trim();
-        options.push(escapeLatex(opt));
-      });
+      const optionEditors = ckeditors.filter(
+        (e) => e.type === "option" && e.editor.sourceElement.closest(".question-box") === box
+      );
+      const options = optionEditors.map((e) => htmlToLatex(e.editor.getData()));
 
-      if (question) {
-        latexContent += `
-\\item \\textbf{Question:} ${question} \\textbf{(${difficulty.toUpperCase()})}
+      latexContent += `
+\\item \\textbf{Question:} ${questionLatex} \\textbf{(${difficulty.toUpperCase()})}
 \\begin{enumerate}[label=(\\alph*)]
 `;
-        options.forEach((option) => {
-          latexContent += `\\item ${option}\n`;
-        });
+      options.forEach(opt => {
+        latexContent += `\\item ${opt}\n`;
+      });
 
-        latexContent += `\\end{enumerate}\n`;
-      }
+      latexContent += `\\end{enumerate}\n`;
     });
 
     latexContent += `\\end{enumerate}\n\\end{document}`;
@@ -62,7 +62,28 @@ export function setupLatexExport() {
   });
 }
 
-// 🔐 Escape LaTeX characters safely
+// 🔁 Convert CKEditor HTML to LaTeX
+function htmlToLatex(html) {
+  let output = html;
+
+  // Replace MathML or inline equations if available
+  output = output.replace(/<math[^>]*?>.*?<\/math>/gs, (match) => {
+    return `\\[${escapeLatex(match)}\\]`; // fallback: wrap math in LaTeX display math
+  });
+
+  // Convert basic formatting (bold, italic, etc.)
+  output = output.replace(/<strong>(.*?)<\/strong>/g, "\\textbf{$1}");
+  output = output.replace(/<b>(.*?)<\/b>/g, "\\textbf{$1}");
+  output = output.replace(/<em>(.*?)<\/em>/g, "\\textit{$1}");
+  output = output.replace(/<i>(.*?)<\/i>/g, "\\textit{$1}");
+
+  // Remove all other HTML tags
+  output = output.replace(/<\/?[^>]+(>|$)/g, "");
+
+  return escapeLatex(output.trim());
+}
+
+// 🔐 Escape special LaTeX characters
 function escapeLatex(str) {
   return str
     .replace(/\\/g, "\\textbackslash{}")
