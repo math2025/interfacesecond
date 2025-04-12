@@ -1,5 +1,6 @@
 import { createQuestionBlock } from "./questionManager.jsx";
 import { showStatusMessage } from "./utils.js";
+import { tiptapEditor } from "./editor.jsx"; // global editor instance (single question)
 
 export function saveQuestionsToLocal() {
   const title = document.getElementById("doc-title").value.trim();
@@ -9,21 +10,17 @@ export function saveQuestionsToLocal() {
   const questions = [];
 
   document.querySelectorAll(".question-box").forEach((box, index) => {
-    const questionField = box.querySelector("math-field.question");
-    const questionContent = questionField ? questionField.value.trim() : "";
-
     const difficulty = box.querySelector(".difficulty")?.value || "medium";
+    const editorContent = box.querySelector(".editor-content");
 
-    const options = [];
-    box.querySelectorAll("math-field.option").forEach((optField) => {
-      options.push(optField?.value.trim() || "");
-    });
+    // Get Tiptap JSON from the editor stored inside the DOM
+    const editorInstance = editorContent?.__tiptapEditor;
+    const contentJson = editorInstance?.getJSON() || {};
 
     questions.push({
       question_number: index + 1,
-      question: questionContent,
       difficulty,
-      options,
+      content: contentJson,
     });
   });
 
@@ -40,7 +37,9 @@ export function loadSavedQuestions() {
   document.getElementById("doc-author").value = savedData.author || "";
   document.getElementById("doc-date").value = savedData.date || "";
 
-  savedData.questions.forEach((q) => createQuestionBlock(q));
+  savedData.questions.forEach((q) => {
+    createQuestionBlock({ question: q.content, difficulty: q.difficulty });
+  });
 }
 
 export function resetAll() {

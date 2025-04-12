@@ -1,7 +1,7 @@
 import { showStatusMessage, generateFileName } from "./utils.js";
+import { getEditorHTML } from "./editor.jsx";
 import "katex/dist/katex.min.css";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-
 
 export async function setupPdfExport() {
   let exportPdfButton = document.getElementById("export-pdf");
@@ -10,15 +10,10 @@ export async function setupPdfExport() {
   const newButton = exportPdfButton.cloneNode(true);
   exportPdfButton.parentNode.replaceChild(newButton, exportPdfButton);
   exportPdfButton = newButton;
-  console.log("111");
 
   exportPdfButton.addEventListener("click", async () => {
-    console.log("222");
     try {
-     // const { PDFDocument, rgb, StandardFonts } = PDFLib;
-     
       const templateBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
-      console.log("333");
       const templateDoc = await PDFDocument.load(templateBytes);
       const [templatePage] = await templateDoc.getPages();
 
@@ -68,44 +63,32 @@ export async function setupPdfExport() {
 
       let currentPage = addNewPage();
 
-      const questionBoxes = document.querySelectorAll(".question-box");
+      const box = document.querySelector(".question-box");
+      const html = getEditorHTML();
+      const questionText = stripHtml(html);
+      const difficulty = box?.querySelector(".difficulty")?.value || "medium";
 
-      questionBoxes.forEach((box, index) => {
-        const questionField = box.querySelector("math-field.question");
-        const questionLatex = questionField?.value?.trim() || "";
-        const difficulty = box.querySelector(".difficulty")?.value || "medium";
+      const lines = splitTextToLines(questionText, 90);
 
-        const options = [];
-        box.querySelectorAll("math-field.option").forEach((opt) => {
-          options.push(opt.value.trim());
-        });
+      currentPage.drawText(`1. (Difficulty: ${difficulty})`, {
+        x: 50,
+        y,
+        size: 12,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      y -= 20;
 
-        const questionText = `${index + 1}. ${stripLatex(questionLatex)} (${difficulty})`;
-
-        if (y < 120) currentPage = addNewPage();
-
-        currentPage.drawText(questionText, {
-          x: 50,
+      lines.forEach((line) => {
+        if (y < 100) currentPage = addNewPage();
+        currentPage.drawText(line, {
+          x: 60,
           y,
-          size: 12,
+          size: 10,
           font,
-          color: rgb(0, 0, 0),
+          color: rgb(0.1, 0.1, 0.1),
         });
-        y -= 20;
-
-        options.forEach((opt, i) => {
-          const label = String.fromCharCode(97 + i);
-          currentPage.drawText(`   (${label}) ${stripLatex(opt)}`, {
-            x: 70,
-            y,
-            size: 10,
-            font,
-            color: rgb(0, 0, 0),
-          });
-          y -= 15;
-        });
-
-        y -= 10;
+        y -= 15;
       });
 
       pages.forEach((page, i) => {
@@ -137,13 +120,32 @@ export async function setupPdfExport() {
   });
 }
 
-// 🧽 Strip LaTeX commands for plain fallback
-function stripLatex(latex) {
-  return latex
-    .replace(/\\[a-zA-Z]+/g, "")
-    .replace(/[{}$]/g, "")
-    .replace(/_/g, " ")
+// 🔤 Strip tags to export raw text
+function stripHtml(html) {
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
+}
+
+// 📏 Wrap lines if too long
+function splitTextToLines(text, maxLength = 80) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+
+  words.forEach(word => {
+    if ((line + word).length <= maxLength) {
+      line += word + ' ';
+    } else {
+      lines.push(line.trim());
+      line = word + ' ';
+    }
+  });
+
+  if (line.trim()) lines.push(line.trim());
+  return lines;
 }
 
 setupPdfExport();

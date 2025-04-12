@@ -1,44 +1,48 @@
-// editor.jsx
-import 'mathlive';
+import { Editor } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import renderMathInElement from 'katex/contrib/auto-render';
+import 'katex/dist/katex.min.css';
 
-// Store global reference to fields if needed
-export let mathFields = [];
+export let tiptapEditor = null;
 
-export function createMathEditor(element, type, container, index = null, content = "") {
-  if (!element) return;
+export function initTiptapEditor(targetElement, content = '') {
+  if (!targetElement) return;
 
-  // Create wrapper
-  const wrapper = document.createElement("div");
-  wrapper.classList.add("editor-wrapper", "mb-4");
-
-  // Create <math-field>
-  const mathField = document.createElement("math-field");
-  mathField.setAttribute("virtual-keyboard-mode", "onfocus");
-  mathField.className = "w-full bg-white border border-gray-300 p-2 rounded";
-  mathField.style.minHeight = type === "question" ? "120px" : "60px";
-  mathField.value = content;
-
-  // Optional: Preview
-  const preview = document.createElement("div");
-  preview.className = "katex-preview mt-2 p-2 border border-dashed rounded text-sm bg-gray-50";
-  preview.innerHTML = "<em>Live equation will show here</em>";
-
-  // Update preview on input
-  mathField.addEventListener("input", () => {
-    preview.innerHTML = mathField.getValue("latex-expanded");
-    renderMathInElement(preview, {
-      delimiters: [
-        { left: "$$", right: "$$", display: true },
-        { left: "$", right: "$", display: false },
-      ],
-      throwOnError: false,
-    });
+  tiptapEditor = new Editor({
+    element: targetElement,
+    extensions: [StarterKit],
+    content:
+      content ||
+      '<p>You can type English and use $inline \\text{math}$ or $$\\frac{a}{b}$$ for block math.</p>',
+    onUpdate: ({ editor }) => {
+      // Render math expressions live
+      renderMathInElement(targetElement, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false },
+        ],
+        throwOnError: false,
+      });
+    },
   });
 
-  // Insert wrapper with math field and preview
-  wrapper.appendChild(mathField);
-  wrapper.appendChild(preview);
-  element.appendChild(wrapper);
+  // Save reference inside DOM for later access (e.g., save/load/export)
+  targetElement.__tiptapEditor = tiptapEditor;
 
-  mathFields.push({ type, mathField, container, index });
+  // Initial math render
+  renderMathInElement(targetElement, {
+    delimiters: [
+      { left: "$$", right: "$$", display: true },
+      { left: "$", right: "$", display: false },
+    ],
+    throwOnError: false,
+  });
+}
+
+export function getEditorJson() {
+  return tiptapEditor?.getJSON();
+}
+
+export function getEditorHTML() {
+  return tiptapEditor?.getHTML();
 }

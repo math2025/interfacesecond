@@ -1,3 +1,5 @@
+import { getEditorHTML } from './editor.jsx';
+
 export function setupLatexExport() {
   const exportLatexButton = document.getElementById("export-latex");
 
@@ -9,7 +11,13 @@ export function setupLatexExport() {
     const author = document.getElementById("doc-author").value.trim() || "Unknown Author";
     const date = document.getElementById("doc-date").value || new Date().toISOString().split("T")[0];
 
-    let latexContent = `
+    // Get question content from Tiptap editor
+    const contentHTML = getEditorHTML();
+    const difficulty = document.querySelector(".question-box .difficulty")?.value || "medium";
+
+    const questionLatex = convertHTMLToLatex(contentHTML);
+
+    const latexContent = `
 \\documentclass[12pt]{article}
 \\usepackage{amsmath}
 \\usepackage{amssymb}
@@ -21,36 +29,13 @@ export function setupLatexExport() {
 \\begin{document}
 \\maketitle
 \\begin{enumerate}
+
+\\item \\textbf{(${difficulty.toUpperCase()})}
+${questionLatex}
+
+\\end{enumerate}
+\\end{document}
 `;
-
-    const boxes = document.querySelectorAll(".question-box");
-
-    boxes.forEach((box, index) => {
-      const questionField = box.querySelector("math-field.question");
-      const question = questionField ? escapeLatex(questionField.value.trim()) : "";
-
-      const difficulty = box.querySelector(".difficulty")?.value || "medium";
-
-      const options = [];
-      box.querySelectorAll("math-field.option").forEach((optionField) => {
-        const opt = optionField.value.trim();
-        options.push(escapeLatex(opt));
-      });
-
-      if (question) {
-        latexContent += `
-\\item \\textbf{Question:} ${question} \\textbf{(${difficulty.toUpperCase()})}
-\\begin{enumerate}[label=(\\alph*)]
-`;
-        options.forEach((option) => {
-          latexContent += `\\item ${option}\n`;
-        });
-
-        latexContent += `\\end{enumerate}\n`;
-      }
-    });
-
-    latexContent += `\\end{enumerate}\n\\end{document}`;
 
     const blob = new Blob([latexContent], { type: "text/plain" });
     const link = document.createElement("a");
@@ -62,7 +47,6 @@ export function setupLatexExport() {
   });
 }
 
-// 🔐 Escape LaTeX characters safely
 function escapeLatex(str) {
   return str
     .replace(/\\/g, "\\textbackslash{}")
@@ -77,4 +61,22 @@ function escapeLatex(str) {
     .replace(/~/g, "\\~{}");
 }
 
-setupLatexExport();
+// 🧠 Convert basic HTML from Tiptap to LaTeX
+function convertHTMLToLatex(html) {
+  return html
+    .replace(/<p>(.*?)<\/p>/g, (_, text) => escapeLatex(text) + '\n\n')
+    .replace(/<strong>(.*?)<\/strong>/g, (_, text) => `\\textbf{${escapeLatex(text)}}`)
+    .replace(/<em>(.*?)<\/em>/g, (_, text) => `\\textit{${escapeLatex(text)}}`)
+    .replace(/<ul>(.*?)<\/ul>/gs, (_, list) => {
+      const items = list.match(/<li>(.*?)<\/li>/g) || [];
+      const converted = items.map(item => `\\item ${escapeLatex(item.replace(/<\/?li>/g, ""))}`).join('\n');
+      return `\\begin{itemize}\n${converted}\n\\end{itemize}`;
+    })
+    .replace(/<ol>(.*?)<\/ol>/gs, (_, list) => {
+      const items = list.match(/<li>(.*?)<\/li>/g) || [];
+      const converted = items.map(item => `\\item ${escapeLatex(item.replace(/<\/?li>/g, ""))}`).join('\n');
+      return `\\begin{enumerate}\n${converted}\n\\end{enumerate}`;
+    })
+    .replace(/<br\s*\/?>/g, '\n')
+    .replace(/<\/?[^>]+>/g, ''); // Remove any leftover tags
+}

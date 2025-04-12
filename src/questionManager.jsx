@@ -1,9 +1,9 @@
 import { showStatusMessage } from "./utils.js";
-import Sortable from "sortablejs"; // ✅ New import
+import { initTiptapEditor } from "./editor.jsx";
+import Sortable from "sortablejs";
 
 let questionHistory = [];
 
-// 🔄 Initialize SortableJS once
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("question-container");
   if (container && !container.dataset.sortableApplied) {
@@ -18,18 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 export function createQuestionBlock(questionData = null) {
   const questionBox = document.createElement("div");
-  questionBox.classList.add(
-    "question-box",
-    "bg-gray-50",
-    "p-4",
-    "rounded-lg",
-    "shadow-sm",
-    "mt-4",
-    "relative",
-    "cursor-move"
-  );
+  questionBox.className = "question-box bg-gray-50 p-4 rounded-lg shadow-sm mt-4 relative cursor-move";
 
-  // ✨ Drag handle
   questionBox.innerHTML = `
     <div class="flex justify-between items-start mb-3">
       <div class="flex items-center gap-2">
@@ -39,9 +29,7 @@ export function createQuestionBlock(questionData = null) {
       <button class="delete-question bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600">🗑️</button>
     </div>
 
-    <math-field class="question w-full border rounded p-2" virtual-keyboard-mode="manual">
-      ${questionData?.question || ""}
-    </math-field>
+    <div class="editor-content border p-3 bg-white rounded mb-3" style="min-height: 150px;"></div>
 
     <div class="mt-3">
       <input type="file" class="question-image hidden" accept="image/*">
@@ -57,28 +45,15 @@ export function createQuestionBlock(questionData = null) {
       <option value="medium" ${questionData?.difficulty === "medium" ? "selected" : ""}>Medium</option>
       <option value="hard" ${questionData?.difficulty === "hard" ? "selected" : ""}>Hard</option>
     </select>
-
-    <label class="block text-gray-700 font-medium mt-4">Options:</label>
-    <div class="options-container mt-2">
-      ${(questionData?.options?.length ? questionData.options : ["", ""]).map((opt) => `
-        <div class="flex items-start space-x-2 option-block mb-3">
-          <math-field class="option w-full border rounded p-2" virtual-keyboard-mode="manual">${opt}</math-field>
-          <div class="flex flex-col space-y-1">
-            <button class="remove-option bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">❌</button>
-            <button class="upload-option-image bg-blue-400 text-white px-2 py-1 rounded hover:bg-blue-500 text-xs">📷</button>
-            <input type="file" class="option-image hidden" accept="image/*">
-            <div class="option-image-preview mt-1"></div>
-          </div>
-        </div>
-      `).join("")}
-    </div>
-
-    <button class="add-option bg-green-500 text-white px-4 py-2 mt-2 rounded hover:bg-green-600">+ Add Option</button>
   `;
 
   document.getElementById("question-container").appendChild(questionBox);
 
-  // 🖼️ Image Upload - Question
+  // ✅ Initialize Tiptap Editor
+  const editorTarget = questionBox.querySelector(".editor-content");
+  initTiptapEditor(editorTarget, questionData?.question || '');
+
+  // 🖼️ Question Image Upload
   questionBox.querySelector(".upload-question-image").addEventListener("click", () => {
     questionBox.querySelector(".question-image").click();
   });
@@ -91,65 +66,18 @@ export function createQuestionBlock(questionData = null) {
     reader.readAsDataURL(e.target.files[0]);
   });
 
-  // ❌ Delete this question
+  // ❌ Delete Question
   questionBox.querySelector(".delete-question").addEventListener("click", () => {
     questionBox.remove();
     showStatusMessage("❌ Question deleted!", "error");
   });
-
-  // ➕ Add Option
-  questionBox.querySelector(".add-option").addEventListener("click", () => {
-    const optionsContainer = questionBox.querySelector(".options-container");
-
-    const optionDiv = document.createElement("div");
-    optionDiv.classList.add("flex", "items-start", "space-x-2", "option-block", "mb-3");
-
-    optionDiv.innerHTML = `
-      <math-field class="option w-full border rounded p-2" virtual-keyboard-mode="manual"></math-field>
-      <div class="flex flex-col space-y-1">
-        <button class="remove-option bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">❌</button>
-        <button class="upload-option-image bg-blue-400 text-white px-2 py-1 rounded hover:bg-blue-500 text-xs">📷</button>
-        <input type="file" class="option-image hidden" accept="image/*">
-        <div class="option-image-preview mt-1"></div>
-      </div>
-    `;
-
-    optionsContainer.appendChild(optionDiv);
-
-    // 🖼️ Image upload
-    optionDiv.querySelector(".upload-option-image").addEventListener("click", () => {
-      optionDiv.querySelector(".option-image").click();
-    });
-    optionDiv.querySelector(".option-image").addEventListener("change", (e) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        optionDiv.querySelector(".option-image-preview").innerHTML =
-          `<img src="${ev.target.result}" class="w-16 h-16 object-cover">`;
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    });
-
-    attachRemoveOptionHandler(optionDiv);
-  });
-
-  // 🧹 Option delete setup
-  questionBox.querySelectorAll(".option-block").forEach(attachRemoveOptionHandler);
 }
 
-// ❌ Option remove logic
-function attachRemoveOptionHandler(optionDiv) {
-  optionDiv.querySelector(".remove-option")?.addEventListener("click", () => {
-    optionDiv.remove();
-    showStatusMessage("❌ Option removed", "error");
-  });
-}
-
-// 🔄 Undo Placeholder
 export function undoLastAction() {
-  const questionContainer = document.getElementById("question-container");
+  const container = document.getElementById("question-container");
   if (questionHistory.length > 0) {
-    const lastDeletedHTML = questionHistory.pop();
-    questionContainer.insertAdjacentHTML("beforeend", lastDeletedHTML);
+    const lastHTML = questionHistory.pop();
+    container.insertAdjacentHTML("beforeend", lastHTML);
     showStatusMessage("🔄 Last action undone!");
   } else {
     showStatusMessage("⚠️ No action to undo!", "error");

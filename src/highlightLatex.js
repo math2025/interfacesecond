@@ -1,7 +1,5 @@
-// highlightLatex.js
-
 import { Mark } from "@tiptap/core";
-import { Plugin } from "prosemirror-state"; // ✅ Correct import
+import { Plugin } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 
 export const HighlightLatex = Mark.create({
@@ -21,7 +19,7 @@ export const HighlightLatex = Mark.create({
               let match;
               while ((match = regex.exec(node.text))) {
                 const start = pos + match.index;
-                const end = start + match.index + match[0].length;
+                const end = start + match[0].length;
 
                 decorations.push(
                   Decoration.inline(start, end, {

@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (window.scriptLoaded) return;
   window.scriptLoaded = true;
 
-  console.log("✅ App Initialized with MathLive");
+  console.log("✅ App Initialized with Tiptap");
 
   // Load saved questions from localStorage
   loadSavedQuestions();

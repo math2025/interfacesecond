@@ -1,9 +1,9 @@
-// exportJson.jsx
+import { getEditorJson } from './editor.jsx';
 
 export function setupExportListeners() {
   const exportJsonButton = document.getElementById("export-json");
 
-  // Remove duplicate listeners safely
+  // Avoid duplicate listeners
   const newExportJsonButton = exportJsonButton.cloneNode(true);
   exportJsonButton.parentNode.replaceChild(newExportJsonButton, exportJsonButton);
 
@@ -12,28 +12,26 @@ export function setupExportListeners() {
     const author = document.getElementById("doc-author").value.trim() || "Author";
     const date = document.getElementById("doc-date").value || new Date().toISOString().split("T")[0];
 
-    const questions = [];
+    const questionBox = document.querySelector(".question-box");
+    if (!questionBox) return alert("No question found!");
 
-    document.querySelectorAll(".question-box").forEach((box, index) => {
-      const questionField = box.querySelector("math-field.question");
-      const question = questionField ? questionField.value.trim() : "";
+    const editorContainer = questionBox.querySelector(".editor-content");
+    const content = getEditorJson(); // from editor.jsx
 
-      const difficulty = box.querySelector(".difficulty").value;
+    const difficulty = questionBox.querySelector(".difficulty")?.value || "medium";
 
-      const options = [];
-      box.querySelectorAll("math-field.option").forEach((optField) => {
-        options.push(optField.value.trim());
-      });
-
-      questions.push({
-        question_number: index + 1,
-        question,
-        difficulty,
-        options,
-      });
-    });
-
-    const jsonData = { title, author, date, questions };
+    const jsonData = {
+      title,
+      author,
+      date,
+      questions: [
+        {
+          question_number: 1,
+          difficulty,
+          content_json: content,
+        },
+      ],
+    };
 
     const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
       type: "application/json",

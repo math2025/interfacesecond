@@ -22,12 +22,6 @@
       src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
     ></script>
 
-    <!-- MathLive (WYSIWYG Math Input) -->
-    <script type="module">
-      import { MathfieldElement } from 'https://unpkg.com/mathlive?module';
-      customElements.define('math-field', MathfieldElement);
-    </script>
-
     <!-- SortableJS for Drag & Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   </head>
@@ -39,15 +33,16 @@
     >
       <!-- Header -->
       <header class="flex items-center justify-between mb-4">
-        <!-- Left: Heading and Subtitle -->
         <div>
-          <h1 class="text-3xl font-bold text-blue-700 dark:text-blue-400">📖 Math Question Builder</h1>
+          <h1 class="text-3xl font-bold text-blue-700 dark:text-blue-400">
+            📖 Math Question Builder
+          </h1>
           <p class="text-gray-500 mt-1 dark:text-gray-300">
             Easily create, save, and export math questions.
           </p>
         </div>
 
-        <!-- Right: Theme Toggle -->
+        <!-- Theme Toggle -->
         <button
           id="theme-toggle-icon"
           class="text-2xl p-2 rounded-full transition-all hover:scale-110 dark:text-yellow-300 text-blue-600"
@@ -64,15 +59,29 @@
       <section class="mt-6 space-y-4">
         <div>
           <label for="doc-title" class="font-semibold">📌 Document Title:</label>
-          <input type="text" id="doc-title" placeholder="Enter title..." />
+          <input
+            type="text"
+            id="doc-title"
+            class="w-full mt-1 p-2 border rounded dark:bg-slate-700"
+            placeholder="Enter title..."
+          />
         </div>
         <div>
           <label for="doc-author" class="font-semibold">👤 Author:</label>
-          <input type="text" id="doc-author" placeholder="Enter author name..." />
+          <input
+            type="text"
+            id="doc-author"
+            class="w-full mt-1 p-2 border rounded dark:bg-slate-700"
+            placeholder="Enter author name..."
+          />
         </div>
         <div>
           <label for="doc-date" class="font-semibold">📅 Date:</label>
-          <input type="date" id="doc-date" />
+          <input
+            type="date"
+            id="doc-date"
+            class="w-full mt-1 p-2 border rounded dark:bg-slate-700"
+          />
         </div>
       </section>
 
@@ -83,13 +92,13 @@
       <div class="flex justify-between mt-6 gap-4">
         <button
           id="add-question"
-          class="add-question bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           ➕ Add Question
         </button>
         <button
           id="undo-action"
-          class="undo-action bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
         >
           🔄 Undo Last Action
         </button>
@@ -97,14 +106,11 @@
 
       <!-- Sticky Export Bar -->
       <section class="export-buttons grid grid-cols-2 gap-4 mt-6 sticky bottom-0 py-4 bg-gray-100 dark:bg-slate-800 z-50 border-t dark:border-slate-700">
-        <button id="save-progress" class="export-json">💾 Save Progress</button>
-        <button id="export-json" class="export-json">📁 Export JSON</button>
-        <button id="export-latex" class="export-latex">📜 Export LaTeX</button>
-        <button id="export-pdf" class="export-pdf">📄 Export PDF</button>
-        <button
-          id="reset-page"
-          class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 col-span-2"
-        >
+        <button id="save-progress" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">💾 Save Progress</button>
+        <button id="export-json" class="bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">📁 Export JSON</button>
+        <button id="export-latex" class="bg-yellow-600 text-white py-2 px-4 rounded hover:bg-yellow-700">📜 Export LaTeX</button>
+        <button id="export-pdf" class="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-800">📄 Export PDF</button>
+        <button id="reset-page" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 col-span-2">
           🔄 Reset
         </button>
       </section>
@@ -139,17 +145,6 @@
       themeToggleBtn.addEventListener("click", () => {
         const isDark = !htmlEl.classList.contains("dark");
         applyTheme(isDark);
-      });
-    </script>
-
-    <!-- SortableJS Activation -->
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        new Sortable(document.getElementById("question-container"), {
-          animation: 200,
-          handle: ".question-box",
-          ghostClass: "opacity-50",
-        });
       });
     </script>
   </body>
